@@ -1,0 +1,124 @@
+<project name="hxsnappy" default="exit" basedir=".">
+    <description>Haxe (C++/Neko) language bindings for the snappy compression library.</description>
+
+    <property environment="env" />
+    <property name="workspace" location="${env.WORKSPACE}" />
+    <property name="api" location="${workspace}/api" />
+    <property name="bin" location="${workspace}/bin" />
+    <property name="ndll" location="${workspace}/ndll" />
+    <property name="src" location="${workspace}/src" />
+    <property name="build" location="${workspace}/build" />
+    <property name="reports"  location="${workspace}/reports" />
+
+    <target name="init" description="Creates the directories needed to store output">
+        <echo>Creating all required directories...</echo>
+        <mkdir dir="${bin}" />
+        <mkdir dir="${reports}" />
+    </target>
+
+    <target name="dependencies" depends="init" description="Installs required dependencies">
+        <echo>Installing required dependencies...</echo>
+        <exec executable="haxelib">
+            <arg value="install" />
+            <arg value="mcover" />
+        </exec>
+    </target>
+
+    <target name="build-bindings" depends="dependencies" description="Builds the bindings and unit test runners">
+        <echo>Compiling the binding source code...</echo>
+        <exec executable="haxelib" resultproperty="build-bindings.code">
+            <arg value="run" />
+            <arg value="hxcpp" />
+            <arg value="${build}/build_bindings.hxml" />
+            <arg value="-DHXCPP_M64" />
+        </exec>
+        <condition property="build-bindings.failed">
+            <isfailure code="${build-bindings.code}" />
+        </condition>
+    </target>
+
+    <target name="build-tests" depends="build-bindings" description="Builds the unit test runners">
+        <echo>Compiling the unit test source code...</echo>
+        <exec executable="haxe" resultproperty="build-tests.code">
+            <arg value="${build}/build_tests.hxml" />
+        </exec>
+        <condition property="build-tests.failed">
+            <isfailure code="${build-tests.code}" />
+        </condition>
+    </target>
+
+    <target name="prepare-tests" depends="build-tests" description="Prepares the environment required by the unit tests">
+        <echo>Preparing the test environment</echo>
+        <copy todir="${workspace}" flatten="true">
+            <fileset dir="${ndll}">
+                <include name="**/*.ndll" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="test" depends="prepare-tests" unless="build.failed" description="Runs the unit tests">
+        <echo>Running unit tests...</echo>
+        <exec executable="${bin}/cpp/Runner" resultproperty="cpp.code" />
+        <exec executable="neko" resultproperty="neko.code">
+            <arg value="${bin}/Runner.n" />
+        </exec>
+        <condition property="test.failed">
+            <or>
+                <isfailure code="${cpp.code}" />
+                <isfailure code="${neko.code}" />
+            </or>
+        </condition>
+    </target>
+
+    <target name="cloc" depends="test" description="Counts the lines of code">
+        <echo>Counting lines of code...</echo>
+        <exec executable="cloc">
+            <arg value="--ignore-whitespace" />
+            <arg value="--read-lang-def=/usr/share/cloc/defs/haxe.txt" />
+            <arg value="--by-file" />
+            <arg value="--xml" />
+            <arg value="-out=${reports}/cloc.xml" />
+            <arg value="${api}" />
+            <arg value="${src}" />
+        </exec>
+
+        <exec executable="xsltproc">
+            <arg value="-o" />
+            <arg value="${reports}/sloccount.sc" />
+            <arg value="/usr/share/cloc/cloc2sloccount.xsl" />
+            <arg value="${reports}/cloc.xml" />
+        </exec>
+    </target>
+
+    <target name="checkstyle" depends="cloc" description="Runs the checkstyle analysis tool">
+        <echo>Performing Checkstyle analysis...</echo>
+        <exec executable="checkstyle">
+            <arg value="-c" />
+            <arg value="${build}/checkstyle.xml" />
+            <arg value="-f" />
+            <arg value="xml" />
+            <arg value="-o" />
+            <arg value="${reports}/checkstyle.xml" />
+            <arg value="-r" />
+            <arg value="${api}" />
+        </exec>
+    </target>
+
+    <target name="cleanup" depends="checkstyle" description="Removes compiled files and directories">
+        <echo>Removing (temporary) directories...</echo>
+        <delete dir="${bin}" />
+        <delete>
+            <fileset dir="${workspace}">
+                <include name="*.ndll" />
+            </fileset>
+        </delete>
+        <delete dir="${workspace}/.temp" />
+    </target>
+
+    <target name="exit" depends="cleanup" description="Marks the build as failed if one of the targets failed">
+        <fail if="build-bindings.failed">Bindings build step failed. Check output log for more information.</fail>
+        <fail if="build-stest.failed">Unit test build step failed. Check output log for more information.</fail>
+        <fail if="test.failed">Unit tests step failed. Check output log for more information.</fail>
+        <echo>Everything went well. Good job!</echo>
+    </target>
+</project>
