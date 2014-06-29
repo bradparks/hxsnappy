@@ -9,6 +9,7 @@ package hxsnappy;
 #end
 import haxe.io.Bytes;
 import haxe.io.BytesData;
+import hxsnappy.SnappyException;
 
 /**
  * Haxe wrapper class around the C FFI implementation wrapping the snappy compression library.
@@ -27,8 +28,10 @@ class Snappy
               function(len:Int) { var r = []; if (len > 0) r[len - 1] = null; return r; },
               null, true, false
             );
+            i;
+        } else {
+            throw new SnappyException("Could not find NekoAPI @ snappy.");
         }
-        i;
     }
     #end
     private static var hxsnappy_compress:BytesData->Int->BytesData   = Lib.load("snappy", "hxsnappy_compress", 2);
@@ -48,7 +51,11 @@ class Snappy
             return Bytes.alloc(0);
         }
 
-        return Bytes.ofData(Snappy.hxsnappy_compress(bytes.getData(), bytes.length));
+        try {
+            return Bytes.ofData(Snappy.hxsnappy_compress(bytes.getData(), bytes.length));
+        } catch (ex:Dynamic) {
+            throw new SnappyException(ex);
+        }
     }
 
     /**
@@ -64,6 +71,10 @@ class Snappy
             return Bytes.alloc(0);
         }
 
-        return Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData(), bytes.length));
+        try {
+            return Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData(), bytes.length));
+        } catch (ex:Dynamic) {
+            throw new SnappyException(ex);
+        }
     }
 }
