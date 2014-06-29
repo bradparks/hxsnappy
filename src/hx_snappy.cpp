@@ -1,20 +1,19 @@
 #include "hx_snappy.hpp"
-#include <string.h>
 #include <snappy-c.h>
 
 extern "C" {
 
 value hxsnappy_compress(value bytes)
 {
-    size_t length;
     const char* data;
+    size_t length;
     if (val_is_string(bytes)) { // Neko
         data   = val_string(bytes);
-        length = strlen(data);
+        length = val_strlen(bytes);
     } else { // C++
         buffer buf = val_to_buffer(bytes);
-        length     = buffer_size(buf);
         data       = buffer_data(buf);
+        length     = buffer_size(buf);
     }
 
     size_t compressed_length = snappy_max_compressed_length(length);
@@ -38,30 +37,35 @@ DEFINE_PRIM(hxsnappy_compress, 1);
 
 value hxsnappy_uncompress(value bytes)
 {
-    size_t length;
     const char* data;
+    size_t length;
     if (val_is_string(bytes)) { // Neko
         data   = val_string(bytes);
-        length = strlen(data);
+        length = val_strlen(bytes);
     } else { // C++
         buffer buf = val_to_buffer(bytes);
-        length     = buffer_size(buf);
         data       = buffer_data(buf);
+        length     = buffer_size(buf);
     }
 
     size_t uncompressed_length;
 
     value val;
     snappy_status ret;
-    ret = snappy_uncompressed_length(data, length, &uncompressed_length);
+    ret = snappy_validate_compressed_buffer(data, length);
     if (ret == SNAPPY_OK) {
-        char uncompressed[uncompressed_length];
-        // TODO: fails on Neko
-        ret = snappy_uncompress(data, length, uncompressed, &uncompressed_length);
+        ret = snappy_uncompressed_length(data, length, &uncompressed_length);
         if (ret == SNAPPY_OK) {
-            buffer buf = alloc_buffer(NULL);
-            buffer_append_sub(buf, uncompressed, uncompressed_length);
-            val = buffer_val(buf);
+            char uncompressed[uncompressed_length];
+            ret = snappy_uncompress(data, length, uncompressed, &uncompressed_length);
+            if (ret == SNAPPY_OK) {
+                buffer buf = alloc_buffer(NULL);
+                buffer_append_sub(buf, uncompressed, uncompressed_length);
+                val = buffer_val(buf);
+            } else {
+                neko_error();
+                val = alloc_null();
+            }
         } else {
             neko_error();
             val = alloc_null();
