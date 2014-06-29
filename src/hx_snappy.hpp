@@ -10,9 +10,9 @@ extern "C" {
  * returns the compressed version of it.
  *
  * Example:
- *   value str = hxsnappy_compress(buffer_val(buf));
+ *   value str = hxsnappy_compress(buffer_val(buf), buffer_size(buf));
  */
-value hxsnappy_compress(value bytes);
+value hxsnappy_compress(value bytes, value length);
 
 
 /*
