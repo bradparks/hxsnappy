@@ -9,7 +9,7 @@ value hxsnappy_compress(value bytes)
     size_t length;
     if (val_is_string(bytes)) { // Neko
         data   = val_string(bytes);
-        length = val_strlen(bytes);
+        length = strlen(data);
     } else { // C++
         buffer buf = val_to_buffer(bytes);
         data       = buffer_data(buf);
@@ -41,7 +41,7 @@ value hxsnappy_uncompress(value bytes)
     size_t length;
     if (val_is_string(bytes)) { // Neko
         data   = val_string(bytes);
-        length = val_strlen(bytes);
+        length = strlen(data);
     } else { // C++
         buffer buf = val_to_buffer(bytes);
         data       = buffer_data(buf);
