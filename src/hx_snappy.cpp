@@ -39,29 +39,31 @@ value hxsnappy_compress(value bytes)
 DEFINE_PRIM(hxsnappy_compress, 1);
 
 
-value hxsnappy_uncompress(value bytes)
+value hxsnappy_uncompress(value compressed, value compressed_length)
 {
+    val_check(compressed_length, int);
+
     const char* data;
-    size_t length;
-    if (val_is_string(bytes)) { // Neko
-        data   = val_string(bytes);
-        length = strlen(data);
+    size_t data_length;
+    if (val_is_string(compressed)) { // Neko
+        data        = val_string(compressed);
+        data_length = val_int(compressed_length);
     } else { // C++
-        buffer buf = val_to_buffer(bytes);
-        data       = buffer_data(buf);
-        length     = buffer_size(buf);
+        buffer buf  = val_to_buffer(compressed);
+        data        = buffer_data(buf);
+        data_length = buffer_size(buf);
     }
 
     size_t uncompressed_length;
 
     value val;
     snappy_status ret;
-    ret = snappy_validate_compressed_buffer(data, length);
+    ret = snappy_validate_compressed_buffer(data, data_length);
     if (ret == SNAPPY_OK) {
-        ret = snappy_uncompressed_length(data, length, &uncompressed_length);
+        ret = snappy_uncompressed_length(data, data_length, &uncompressed_length);
         if (ret == SNAPPY_OK) {
             char uncompressed[uncompressed_length];
-            ret = snappy_uncompress(data, length, uncompressed, &uncompressed_length);
+            ret = snappy_uncompress(data, data_length, uncompressed, &uncompressed_length);
             if (ret == SNAPPY_OK) {
                 buffer buf = alloc_buffer(NULL);
                 buffer_append_sub(buf, uncompressed, uncompressed_length);
@@ -81,6 +83,6 @@ value hxsnappy_uncompress(value bytes)
 
     return val;
 }
-DEFINE_PRIM(hxsnappy_uncompress, 1);
+DEFINE_PRIM(hxsnappy_uncompress, 2);
 
 } // extern "C"

@@ -21,9 +21,9 @@ value hxsnappy_compress(value bytes);
  *
  * Example:
  *   value compressed = hxsnappy_compress(...);
- *   value str = hxsnappy_uncompress(compressed);
+ *   value str = hxsnappy_uncompress(compressed, compressed_length);
  */
-value hxsnappy_uncompress(value bytes);
+value hxsnappy_uncompress(value compressed, value compressed_length);
 
 #ifdef __cplusplus
 } // extern "C"

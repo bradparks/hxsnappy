@@ -31,8 +31,8 @@ class Snappy
         i;
     }
     #end
-    private static var hxsnappy_compress:BytesData->BytesData   = Lib.load("snappy", "hxsnappy_compress", 1);
-    private static var hxsnappy_uncompress:BytesData->BytesData = Lib.load("snappy", "hxsnappy_uncompress", 1);
+    private static var hxsnappy_compress:BytesData->BytesData        = Lib.load("snappy", "hxsnappy_compress", 1);
+    private static var hxsnappy_uncompress:BytesData->Int->BytesData = Lib.load("snappy", "hxsnappy_uncompress", 2);
 
 
     /**
@@ -64,6 +64,6 @@ class Snappy
             return Bytes.alloc(0);
         }
 
-        return Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData()));
+        return Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData(), bytes.length));
     }
 }
