@@ -5,10 +5,6 @@
 extern "C" {
 #endif
 
-#define  IMPLEMENT_API
-#define  NEKO_COMPATIBLE 1
-#include <hx/CFFI.h>
-
 /*
  * Compresses the string stored behind "str" and
  * returns the compressed version of it.

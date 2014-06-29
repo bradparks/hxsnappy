@@ -1,5 +1,9 @@
-#include "hx_snappy.hpp"
+#define  IMPLEMENT_API
+#define  NEKO_COMPATIBLE 1
+#include <hx/CFFI.h>
 #include <snappy-c.h>
+
+#include "hx_snappy.hpp"
 
 extern "C" {
 
