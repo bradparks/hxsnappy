@@ -1,5 +1,5 @@
 #define  IMPLEMENT_API
-#define  NEKO_COMPATIBLE 1
+#define  NEKO_COMPATIBLE
 #include <hx/CFFI.h>
 #include <snappy-c.h>
 

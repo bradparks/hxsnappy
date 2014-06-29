@@ -47,7 +47,7 @@
         </condition>
     </target>
 
-    <target name="prepare-tests" depends="build-tests" description="Prepares the environment required by the unit tests">
+    <target name="prepare-tests" depends="build-tests" unless="build-tests.failed" description="Prepares the environment required by the unit tests">
         <echo>Preparing the test environment</echo>
         <copy todir="${workspace}" flatten="true">
             <fileset dir="${ndll}">
@@ -56,7 +56,7 @@
         </copy>
     </target>
 
-    <target name="test" depends="prepare-tests" unless="build.failed" description="Runs the unit tests">
+    <target name="test" depends="prepare-tests" unless="build-tests.failed" description="Runs the unit tests">
         <echo>Running unit tests...</echo>
         <exec executable="${bin}/cpp/Runner" resultproperty="cpp.code" />
         <exec executable="neko" resultproperty="neko.code">
