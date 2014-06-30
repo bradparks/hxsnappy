@@ -48,15 +48,18 @@ class Snappy
      */
     public static function compress(bytes:Bytes):Bytes
     {
+        var compressed:Bytes;
         if (bytes == null || bytes.length == 0) {
-            return Bytes.alloc(0);
+            compressed = Bytes.alloc(0);
+        } else {
+            try {
+                compressed = Bytes.ofData(Snappy.hxsnappy_compress(bytes.getData(), bytes.length));
+            } catch (ex:Dynamic) {
+                throw new SnappyException(ex);
+            }
         }
 
-        try {
-            return Bytes.ofData(Snappy.hxsnappy_compress(bytes.getData(), bytes.length));
-        } catch (ex:Dynamic) {
-            throw new SnappyException(ex);
-        }
+        return compressed;
     }
 
     /**
@@ -68,15 +71,18 @@ class Snappy
      */
     public static function uncompress(bytes:Bytes):Bytes
     {
+        var uncompressed:Bytes;
         if (bytes == null || bytes.length == 0) {
-            return Bytes.alloc(0);
+            uncompressed = Bytes.alloc(0);
+        } else {
+            try {
+                uncompressed = Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData(), bytes.length));
+            } catch (ex:Dynamic) {
+                throw new SnappyException(ex);
+            }
         }
 
-        try {
-            return Bytes.ofData(Snappy.hxsnappy_uncompress(bytes.getData(), bytes.length));
-        } catch (ex:Dynamic) {
-            throw new SnappyException(ex);
-        }
+        return uncompressed;
     }
 
     /**
