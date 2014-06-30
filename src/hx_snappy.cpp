@@ -24,8 +24,7 @@ value hxsnappy_compress(value bytes, value length)
     char compressed[compressed_length];
 
     value val;
-    snappy_status ret = snappy_compress(data, data_length, compressed, &compressed_length);
-    if (ret == SNAPPY_OK) {
+    if (snappy_compress(data, data_length, compressed, &compressed_length) == SNAPPY_OK) {
         buffer buf = alloc_buffer(NULL);
         buffer_append_sub(buf, compressed, compressed_length);
         val = buffer_val(buf);
@@ -56,17 +55,14 @@ value hxsnappy_uncompress(value compressed, value compressed_length)
 
     value val;
     snappy_status ret;
-    ret = snappy_validate_compressed_buffer(data, data_length);
+    ret = snappy_uncompressed_length(data, data_length, &uncompressed_length);
     if (ret == SNAPPY_OK) {
-        ret = snappy_uncompressed_length(data, data_length, &uncompressed_length);
+        char uncompressed[uncompressed_length];
+        ret = snappy_uncompress(data, data_length, uncompressed, &uncompressed_length);
         if (ret == SNAPPY_OK) {
-            char uncompressed[uncompressed_length];
-            ret = snappy_uncompress(data, data_length, uncompressed, &uncompressed_length);
-            if (ret == SNAPPY_OK) {
-                buffer buf = alloc_buffer(NULL);
-                buffer_append_sub(buf, uncompressed, uncompressed_length);
-                val = buffer_val(buf);
-            }
+            buffer buf = alloc_buffer(NULL);
+            buffer_append_sub(buf, uncompressed, uncompressed_length);
+            val = buffer_val(buf);
         }
     }
 
@@ -78,5 +74,29 @@ value hxsnappy_uncompress(value compressed, value compressed_length)
     return val;
 }
 DEFINE_PRIM(hxsnappy_uncompress, 2);
+
+
+value hxsnappy_validate(value compressed, value compressed_length)
+{
+    val_check(compressed_length, int);
+
+    const char* data;
+    if (val_is_string(compressed)) { // Neko
+        data = val_string(compressed);
+    } else { // C++
+        buffer buf = val_to_buffer(compressed);
+        data       = buffer_data(buf);
+    }
+
+    value val;
+    if (snappy_validate_compressed_buffer(data, val_int(compressed_length)) == SNAPPY_OK) {
+        alloc_bool(true);
+    } else {
+        val = alloc_bool(false);
+    }
+
+    return val;
+}
+DEFINE_PRIM(hxsnappy_validate, 2);
 
 } // extern "C"

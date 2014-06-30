@@ -25,6 +25,22 @@ value hxsnappy_compress(value bytes, value length);
  */
 value hxsnappy_uncompress(value compressed, value compressed_length);
 
+
+/*
+ * Validates that the compressed bytes can be uncompressed.
+ *
+ * This check is about 4x faster than uncompress itself.
+ *
+ * Example:
+ *   value compressed = hxsnappy_compress(...);
+ *   value valid = hxsnappy_validate(compressed, buffer_size(val_to_buffer(compressed)))
+ *   ...
+ *   if (val_bool(valid)) {
+ *     // uncompress
+ *   }
+ */
+value hxsnappy_validate(value compressed, value compressed_length);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

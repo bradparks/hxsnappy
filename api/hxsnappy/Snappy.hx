@@ -36,6 +36,7 @@ class Snappy
     #end
     private static var hxsnappy_compress:BytesData->Int->BytesData   = Lib.load("snappy", "hxsnappy_compress", 2);
     private static var hxsnappy_uncompress:BytesData->Int->BytesData = Lib.load("snappy", "hxsnappy_uncompress", 2);
+    private static var hxsnappy_validate:BytesData->Int->Bool        = Lib.load("snappy", "hxsnappy_validate", 2);
 
 
     /**
@@ -76,5 +77,17 @@ class Snappy
         } catch (ex:Dynamic) {
             throw new SnappyException(ex);
         }
+    }
+
+    /**
+     * Checks if the compressed bytes can sucessfully be uncompressed by Snappy.
+     *
+     * @param Bytes bytes the Bytes to validate
+     *
+     * @return Bool true if valid
+     */
+    public static function validate(bytes:Bytes):Bool
+    {
+        return Snappy.hxsnappy_validate(bytes, bytes.length);
     }
 }
