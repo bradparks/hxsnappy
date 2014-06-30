@@ -3,7 +3,7 @@
     "url" : "https://github.com/MaddinXx/hxsnappy",
     "license": "MIT",
     "tags": ["snappy", "compression", "compress", "google", "neko", "cpp"],
-    "description": "Haxe (C++/Neko) language bindings for the snappy compression library.",
+    "description": "Haxe (C++/Neko) language bindings for the Snappy compression library.",
     "classPath": "api",
     "dependencies": {
         "hxstd": ""

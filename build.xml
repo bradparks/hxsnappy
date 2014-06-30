@@ -1,5 +1,5 @@
 <project name="hxsnappy" default="exit" basedir=".">
-    <description>Haxe (C++/Neko) language bindings for the snappy compression library.</description>
+    <description>Haxe (C++/Neko) language bindings for the Snappy compression library.</description>
 
     <property environment="env" />
     <property name="workspace" location="${env.WORKSPACE}" />

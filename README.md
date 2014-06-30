@@ -1,6 +1,6 @@
 # hxsnappy [![Build Status](https://ci.rackster.ch/buildStatus/icon?job=hxsnappy)](https://ci.rackster.ch/job/hxsnappy/)
 
-> Haxe (C++/Neko) language bindings for the snappy compression library.
+> Haxe (C++/Neko) language bindings for the Snappy compression library.
 
 ## License
 

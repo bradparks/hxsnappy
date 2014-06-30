@@ -12,7 +12,7 @@ import haxe.io.BytesData;
 import hxsnappy.SnappyException;
 
 /**
- * Haxe wrapper class around the C FFI implementation wrapping the snappy compression library.
+ * Haxe wrapper class around the C FFI implementation wrapping the Snappy compression library.
  */
 class Snappy
 {
