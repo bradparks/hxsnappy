@@ -66,15 +66,11 @@ value hxsnappy_uncompress(value compressed, value compressed_length)
                 buffer buf = alloc_buffer(NULL);
                 buffer_append_sub(buf, uncompressed, uncompressed_length);
                 val = buffer_val(buf);
-            } else {
-                neko_error();
-                val = alloc_null();
             }
-        } else {
-            neko_error();
-            val = alloc_null();
         }
-    } else {
+    }
+
+    if (ret != SNAPPY_OK) {
         neko_error();
         val = alloc_null();
     }
