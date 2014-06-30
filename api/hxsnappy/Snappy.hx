@@ -88,6 +88,6 @@ class Snappy
      */
     public static function validate(bytes:Bytes):Bool
     {
-        return Snappy.hxsnappy_validate(bytes, bytes.length);
+        return Snappy.hxsnappy_validate(bytes.getData(), bytes.length);
     }
 }
