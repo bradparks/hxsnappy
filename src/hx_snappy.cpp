@@ -90,7 +90,7 @@ value hxsnappy_validate(value compressed, value compressed_length)
 
     value val;
     if (snappy_validate_compressed_buffer(data, val_int(compressed_length)) == SNAPPY_OK) {
-        alloc_bool(true);
+        val = alloc_bool(true);
     } else {
         val = alloc_bool(false);
     }
